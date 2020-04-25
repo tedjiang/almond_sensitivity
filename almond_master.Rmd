@@ -46,3 +46,12 @@ clim_3 <- clim %>%
 
 test <- almond_anomaly(clim_3)
 ```
+
+```{r}
+#Create a df with wrong year format
+clim_4 <- clim %>% 
+  mutate(month = "January")
+
+test <- almond_anomaly(clim_4)
+```
+
