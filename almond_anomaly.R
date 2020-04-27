@@ -63,7 +63,7 @@ almond_anomaly = function(clim_data, a = -0.015, b = -0.0046, c = -0.07, d = 0.0
   
   # Mutate a new column to store all the results
   climate_almond <- climate_almond %>% 
-    mutate(anomaly = a*tn2 + b*tn2^2 + c*p1 + c*p1^2 + e)
+    mutate(anomaly = a*tn2 + b*tn2^2 + c*p1 + d*p1^2 + e)
   
   mean_anomaly <- mean(climate_almond$anomaly)
   
