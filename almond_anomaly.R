@@ -50,7 +50,7 @@ almond_anomaly = function(clim_data, a = -0.015, b = -0.0046, c = -0.07, d = 0.0
   # Data wrangling after all the error checking
   climate_df <- clim_data %>%
       group_by(month, year) %>% 
-      summarise(tmax = mean(tmax_c), tmin = mean(tmin_c), precip=mean(precip))
+      summarise(tmax = mean(tmax_c), tmin = mean(tmin_c), precip=sum(precip))
   
   # Creating a data frame storing necessary information for almond
   climate_tn2 <- climate_df %>% 
