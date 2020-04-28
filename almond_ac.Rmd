@@ -15,6 +15,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(pse)
 library(sensitivity)
+library(gridExtra)
 
 # source function
 source('~/Documents/github/almond_sensitivity/almond_anomaly.R')
@@ -108,20 +109,22 @@ Sensitivity ranking
 sens_results_LH = as.data.frame(sens_results_LH)
 
 # boxplot
-  ggplot(data = sens_results_LH, aes(x = " ", y = mean_yield)) +
-    geom_boxplot(fill = "brown") +
-    labs( 
-     title = "Latin Hypercube Uncertainty",
-      x = "Almond",
-      y = "Yield (as anomoly)"
-      ) +
-    theme_classic()
-  
+boxplot_LH <-  ggplot(data = sens_results_LH, aes(x = " ", y = mean_yield)) +
+                  geom_boxplot(fill = "brown") +
+                  labs( 
+                   title = "Latin Hypercube Uncertainty",
+                    x = "Almond",
+                    y = "Yield (as anomoly)"
+                    ) +
+                  theme_classic()
+  boxplot_LH
 # cumulative distribution   
 sens_almond_cdf = pse::tell(sens_almond, sens_results_LH, res.names=c("mean_yield"))
-plotecdf(sens_almond_cdf, col = "red", lwd = 5, 
-         xlab = "Mean Almond Yield Anomaly", 
-         main = "Empirical Cumulative Distribution Latin Hypercube Method")
+
+cum_dist_lh <- plotecdf(sens_almond_cdf, col = "red", lwd = 5, 
+                 xlab = "Mean Almond Yield Anomaly", 
+                 main = "Empirical Cumulative Distribution Latin Hypercube Method")
+cum_dist_lh
 ```
 
 
@@ -205,21 +208,31 @@ colnames(results_sobel) = c("mean_yield")
 results_sobel_df <- as.data.frame(results_sobel)
 
 # boxplot
-ggplot(data = results_sobel_df, aes(x = " ", y = mean_yield)) +
-    geom_boxplot(fill = "green") +
-    labs( 
-     title = "Sobel Uncertainty",
-      x = "Almond",
-      y = "Yield (as anomoly)"
-      ) +
-    theme_classic()
+boxplot_sobel <- ggplot(data = results_sobel_df, aes(x = " ", y = mean_yield)) +
+          geom_boxplot(fill = "green") +
+          labs( 
+           title = "Sobel Uncertainty",
+            x = "Almond",
+            y = "Yield (as anomoly)"
+            ) +
+          theme_classic()
+
+boxplot_sobel
 
 # cumulative distribution   
-ggplot(results_sobel_df, aes(mean_yield)) +
-  stat_ecdf(geom = "step") +
-  xlab("Mean Yield Anomaly (ton/acre)") +
-  labs(title = "Cumulative Distribution Sobel Method") +
-  theme_classic()
+cum_dis_sobel <- ggplot(results_sobel_df, aes(mean_yield)) +
+                stat_ecdf(geom = "step") +
+                xlab("Mean Yield Anomaly (ton/acre)") +
+                labs(title = "Cumulative Distribution Sobel Method") +
+                theme_classic()
+cum_dis_sobel
+```
+
+#### All graphs
+
+```{r}
+
+grid.arrange(boxplot_LH, boxplot_sobel, cum_dis_sobel, ncol = 2)
 
 ```
 
