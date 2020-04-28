@@ -14,6 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 # load packages
 library(tidyverse)
 library(pse)
+library(sensitivity)
 
 # source function
 source('~/Documents/github/almond_sensitivity/almond_anomaly.R')
@@ -32,7 +33,7 @@ source('~/Documents/github/almond_sensitivity/almond_anomaly.R')
 factors = c("a", "b", "c", "d", "e")
 
 # Decide How many parameter sets to run
-nsets = 100
+nsets = 500
 
 # choose distributions for parameters - 
 q = c("qnorm", "qnorm", "qnorm", "qnorm", "qnorm")
@@ -40,7 +41,7 @@ q.arg = list(list(mean = -0.015, sd = 0.20),
              list(mean = -0.0046, sd = 0.20), 
              list(mean = -0.07, sd = 0.20),
              list(mean = 0.0043, sd = 0.20), 
-             list(mean = 99999, sd = 0.20))
+             list(mean = 0.28, sd = 0.20))
 
 # generate samples from LHS
 sens_almond = LHS(NULL, factors, nsets, q, q.arg)
@@ -79,6 +80,7 @@ colnames(sens_results_LH) = c("mean_yield")
 ```{r}
 
 # send results back
+# tell() provides the sensitivity structure created by LHS, results from model simulations
 sens_almond = pse::tell(sens_almond, t(sens_results_LH), 
                         res.names=c("mean_yield"))
 # plot sensitivity
@@ -93,10 +95,11 @@ sens_almond$prcc
 Sensitivity ranking
 
 * 1) d (precip coefficient) 
-* 2) e (model intercept) 
-* 3) a (temp coefficient)
-* 4) b (temp coefficient) 
-* 5) c (precip coefficient) 
+* 2) a (temp coefficient)
+* 3) b (temp coefficient) 
+* 4) c (precip coefficient) 
+* 5) e (model intercept) 
+
 
 **Graph uncertainty in mean yield anomaly across all parameter uncertainty (boxplot and cummulative distribution of the output).**
 
@@ -104,7 +107,7 @@ Sensitivity ranking
 # make it a dataframe
 sens_results_LH = as.data.frame(sens_results_LH)
 
-# plot it
+# boxplot
   ggplot(data = sens_results_LH, aes(x = " ", y = mean_yield)) +
     geom_boxplot(fill = "brown") +
     labs( 
@@ -113,16 +116,112 @@ sens_results_LH = as.data.frame(sens_results_LH)
       y = "Yield (as anomoly)"
       ) +
     theme_classic()
-
+  
+# cumulative distribution   
+sens_almond_cdf = pse::tell(sens_almond, sens_results_LH, res.names=c("mean_yield"))
+plotecdf(sens_almond_cdf, col = "red", lwd = 5, 
+         xlab = "Mean Almond Yield Anomaly", 
+         main = "Empirical Cumulative Distribution Latin Hypercube Method")
 ```
 
 
 #### **Sobel method**
 
+Workflow:
+
+* run sobel to get parameter sets in a sensitivity analysis object
+* run model with those parameter sets
+* tell the senstivity object about results associated with each parameter set
+* look at sensitivity analysis metric from sobel
+
 ```{r}
+
+# number of runs
+np=500
+
+### generate two examples of random number from parmeter distributions ####
+
+  # naming parameters
+  a = rnorm(mean = -0.015, sd = 0.20, n=np)
+  b = rnorm(mean = -0.0046, sd = 0.20, n=np)
+  c = rnorm(mean = -0.07, sd = 0.20, n=np)
+  d = rnorm(mean = 0.0043, sd = 0.20, n=np)
+  e = rnorm(mean = 0.28, sd = 0.20, n=np)
+  
+  # create dataframe
+  X1 = cbind.data.frame(a, b, c, d, e)
+  
+  ## repeat process for second dataframe
+  # naming parameters
+    a = rnorm(mean = -0.015, sd = 0.20, n=np)
+    b = rnorm(mean = -0.0046, sd = 0.20, n=np)
+    c = rnorm(mean = -0.07, sd = 0.20, n=np)
+    d = rnorm(mean = 0.0043, sd = 0.20, n=np)
+    e = rnorm(mean = 0.28, sd = 0.20, n=np)
+  
+  # create dataframe
+  X2 = cbind.data.frame(a, b, c, d, e)
+
+# run sobel sensitivity
+sens_sobel = sobol2007(model = NULL, X1, X2, nboot = 100)
+
+# run model with parameters generated from sobel
+res = mapply(FUN = almond_anomaly,
+             a = sens_sobel$X$a,
+             b = sens_sobel$X$b,
+             c = sens_sobel$X$c,
+             d = sens_sobel$X$d,
+             e = sens_sobel$X$e,
+             MoreArgs=list(clim_data = clim,
+                           mean_only = TRUE))
+
+
+sens_sobel_tell = sensitivity::tell(sens_sobel, res, res.names="mean_yield")
+
+print(sens_sobel_tell)
+plot(sens_sobel_tell)
+
 
 ```
 
+**Rank the parameters in term of their sensitivity**
+
+* 1) d
+* 2) c
+* 3) a 
+* 4) b
+* 5) e
+
+
+**Graph uncertainty in mean yield anomaly across all parameter uncertainty (boxplot and cummulative distribution of the output).**
+
+```{r}
+
+# turn into matrix using unlist 
+results_sobel = matrix((unlist(res)), ncol=1, byrow=TRUE)
+colnames(results_sobel) = c("mean_yield")
+
+# make a data frame for plotting
+results_sobel_df <- as.data.frame(results_sobel)
+
+# boxplot
+ggplot(data = results_sobel_df, aes(x = " ", y = mean_yield)) +
+    geom_boxplot(fill = "green") +
+    labs( 
+     title = "Sobel Uncertainty",
+      x = "Almond",
+      y = "Yield (as anomoly)"
+      ) +
+    theme_classic()
+
+# cumulative distribution   
+ggplot(results_sobel_df, aes(mean_yield)) +
+  stat_ecdf(geom = "step") +
+  xlab("Mean Yield Anomaly (ton/acre)") +
+  labs(title = "Cumulative Distribution Sobel Method") +
+  theme_classic()
+
+```
 
 
 Repeat using twice as many parameter sets as you did in your first sensitivity analysis - and look at how this changes the sensitivity results
