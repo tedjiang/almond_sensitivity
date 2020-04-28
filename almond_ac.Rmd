@@ -496,7 +496,8 @@ grid.arrange(boxplot_LH, cum_dist_lh_gg, boxplot_sobel, cum_dis_sobel, ncol = 2)
 
 ```
 
-* Both Sobol and LHS method show that the mean almond yield anomaly is the most sensitive to the precipitation^2 parameter(d), following by the precipitation parameter(c). 
-* Both Sobol and LHS method show similar results distribution.
-* Changing the simulation time from 1k to 2k does not have a significant impact on the sensitivity analyses results. However, there might be a difference when the number of simulation is even larger.
+
+### Writeup
+
+Both the Sobol and LHS methods showed a similar results distribution. Additionally, both methods show that the mean mean almond yield anomaly is most sensitive to the precipitation^2 parameter(d), followed by the precipitation parameter(c). We did not observe a significant difference in the sensitivity analysis results for either method afteer changing the simulations runs from 1k to 2k.However, there might be a difference when the number of simulation is even larger.
 
