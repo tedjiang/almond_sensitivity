@@ -113,7 +113,7 @@ boxplot_LH <-  ggplot(data = sens_results_LH, aes(x = " ", y = mean_yield)) +
                   labs( 
                    title = "Latin Hypercube Uncertainty",
                     x = "Almond",
-                    y = "Yield (as anomoly)"
+                    y = "Mean Yield Anomaly (ton/acre)"
                     ) +
                   theme_classic()
   boxplot_LH
@@ -124,6 +124,15 @@ cum_dist_lh <- plotecdf(sens_almond_cdf, col = "red", lwd = 5,
                  xlab = "Mean Almond Yield Anomaly", 
                  main = "Empirical Cumulative Distribution Latin Hypercube Method")
 cum_dist_lh
+
+# or using ggplot 
+cum_dist_lh_gg <- ggplot(sens_results_LH, aes(mean_yield)) +
+                  stat_ecdf(geom = "step") +
+                  xlab("Mean Yield Anomaly (ton/acre)") +
+                  ylab("Proportion") +
+                  labs(title = "Cumulative Distribution LHS Method") +
+                 theme_classic()
+cum_dist_lh_gg
 ```
 
 
@@ -212,7 +221,7 @@ boxplot_sobel <- ggplot(data = results_sobel_df, aes(x = " ", y = mean_yield)) +
           labs( 
            title = "Sobel Uncertainty",
             x = "Almond",
-            y = "Yield (as anomoly)"
+            y = "Mean Yield Anomaly (ton/acre)"
             ) +
           theme_classic()
 
@@ -222,6 +231,7 @@ boxplot_sobel
 cum_dis_sobel <- ggplot(results_sobel_df, aes(mean_yield)) +
                 stat_ecdf(geom = "step") +
                 xlab("Mean Yield Anomaly (ton/acre)") +
+                ylab("Proportion") +
                 labs(title = "Cumulative Distribution Sobel Method") +
                 theme_classic()
 cum_dis_sobel
@@ -231,7 +241,7 @@ cum_dis_sobel
 
 ```{r}
 
-grid.arrange(boxplot_LH, boxplot_sobel, cum_dis_sobel, ncol = 2)
+grid.arrange(boxplot_LH, cum_dist_lh_gg, boxplot_sobel, cum_dis_sobel, ncol = 2)
 
 ```
 
@@ -325,7 +335,7 @@ boxplot_LH <-  ggplot(data = sens_results_LH, aes(x = " ", y = mean_yield)) +
                   labs( 
                    title = "Latin Hypercube Uncertainty",
                     x = "Almond",
-                    y = "Yield (as anomoly)"
+                    y = "Mean Yield Anomaly (ton/acre)"
                     ) +
                   theme_classic()
   boxplot_LH
@@ -336,6 +346,15 @@ cum_dist_lh <- plotecdf(sens_almond_cdf, col = "red", lwd = 5,
                  xlab = "Mean Almond Yield Anomaly", 
                  main = "Empirical Cumulative Distribution Latin Hypercube Method")
 cum_dist_lh
+
+# or using ggplot 
+cum_dist_lh_gg <- ggplot(sens_results_LH, aes(mean_yield)) +
+                  stat_ecdf(geom = "step") +
+                  xlab("Mean Yield Anomaly (ton/acre)") +
+                  ylab("Proportion") +
+                  labs(title = "Cumulative Distribution LHS Method") +
+                 theme_classic()
+cum_dist_lh_gg
 ```
 
 
@@ -424,7 +443,7 @@ boxplot_sobel <- ggplot(data = results_sobel_df, aes(x = " ", y = mean_yield)) +
           labs( 
            title = "Sobel Uncertainty",
             x = "Almond",
-            y = "Yield (as anomoly)"
+            y = "Mean Yield Anomaly (ton/acre)"
             ) +
           theme_classic()
 
@@ -434,6 +453,7 @@ boxplot_sobel
 cum_dis_sobel <- ggplot(results_sobel_df, aes(mean_yield)) +
                 stat_ecdf(geom = "step") +
                 xlab("Mean Yield Anomaly (ton/acre)") +
+                ylab("Proportion") +
                 labs(title = "Cumulative Distribution Sobel Method") +
                 theme_classic()
 cum_dis_sobel
@@ -443,7 +463,7 @@ cum_dis_sobel
 
 ```{r}
 
-grid.arrange(boxplot_LH, boxplot_sobel, cum_dis_sobel, ncol = 2)
+grid.arrange(boxplot_LH, cum_dist_lh_gg, boxplot_sobel, cum_dis_sobel, ncol = 2)
 
 ```
 
