@@ -107,9 +107,9 @@ ggplot(lhs_compare, aes(y = value, x = yield))+
   theme_minimal()
 ```
 
-# Sobel method, 1000 iterations.
+# Sobel method, 10000 iterations.
 ```{r}
-np = 1000
+np = 10000
 a = rnorm(mean=-0.015, sd=0.015/5, n = np)
 b = rnorm(mean=-0.0046, sd=0.0046/5, n = np)
 c = rnorm(mean=-0.07, sd=0.07/5, n = np)
@@ -161,9 +161,9 @@ ggplot(sens_result_sobel, aes(value)) +
   xlab("Mean Yield Anomaly (ton/acre)")
 ```
 
-# Sobel method, 2000 iterations.
+# Sobel method, 20000 iterations.
 ```{r}
-np_2 = 2000
+np_2 = 20000
 a = rnorm(mean=-0.015, sd=0.015/5, n = np_2)
 b = rnorm(mean=-0.0046, sd=0.0046/5, n = np_2)
 c = rnorm(mean=-0.07, sd=0.07/5, n = np_2)
