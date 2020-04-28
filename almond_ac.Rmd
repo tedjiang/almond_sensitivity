@@ -17,7 +17,7 @@ library(pse)
 library(sensitivity)
 
 # source function
-source('~/Documents/github/almond_sensitivity/almond_anomaly.R')
+source('almond_anomaly.R')
 ```
 
 ## Sensitivity Analysis on Almond Yield Function
