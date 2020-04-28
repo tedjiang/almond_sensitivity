@@ -1,0 +1,128 @@
+---
+title: "almond_AC"
+author: "AnnaClaire Marley"
+date: "4/27/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r, include = FALSE}
+# load packages
+library(tidyverse)
+library(pse)
+
+# source function
+source('~/Documents/github/almond_sensitivity/almond_anomaly.R')
+```
+
+## Sensitivity Analysis on Almond Yield Function
+
+* **Perform a sensitivity analysis of how mean anomaly varies all of the parameters used in the almond yield model**
+* **Assume parameters are normally distributed with standard deviation of 20% mean value**
+
+#### **Latin Hypercube Method**
+
+```{r}
+
+# All parameters of almond yield model
+factors = c("a", "b", "c", "d", "e")
+
+# Decide How many parameter sets to run
+nsets = 100
+
+# choose distributions for parameters - 
+q = c("qnorm", "qnorm", "qnorm", "qnorm", "qnorm")
+q.arg = list(list(mean = -0.015, sd = 0.20), 
+             list(mean = -0.0046, sd = 0.20), 
+             list(mean = -0.07, sd = 0.20),
+             list(mean = 0.0043, sd = 0.20), 
+             list(mean = 99999, sd = 0.20))
+
+# generate samples from LHS
+sens_almond = LHS(NULL, factors, nsets, q, q.arg)
+
+# set of values generaated for each parameter
+sens_pars = get.data(sens_almond)
+head(sens_pars)
+
+# now run the model for each set of parameter samples
+# first create a data structure to store results
+sens_results = matrix(nrow=nsets, ncol=1)
+
+# read in the input data
+clim <- read.table("clim.txt")
+
+# run the almond yield model for each parameter set
+tmp = mapply(FUN=almond_anomaly, 
+             a = sens_pars$a, 
+             b = sens_pars$b, 
+             c = sens_pars$c, 
+             d = sens_pars$d,
+             e = sens_pars$e,
+             MoreArgs=list(clim_data = clim,
+                           mean_only = TRUE))
+head(tmp)
+
+# turn into matrix using unlist 
+sens_results_LH = matrix((unlist(tmp)), ncol=1, byrow=TRUE)
+colnames(sens_results_LH) = c("mean_yield")
+
+
+```
+
+**Rank the parameters in term of their sensitivity**
+
+```{r}
+
+# send results back
+sens_almond = pse::tell(sens_almond, t(sens_results_LH), 
+                        res.names=c("mean_yield"))
+# plot sensitivity
+pse::plotscatter(sens_almond, col="blue", cex=5)
+
+# Plot the partial rank correlation coefficient
+pse::plotprcc(sens_almond)
+sens_almond$prcc
+
+```
+
+Sensitivity ranking
+
+* 1) d (precip coefficient) 
+* 2) e (model intercept) 
+* 3) a (temp coefficient)
+* 4) b (temp coefficient) 
+* 5) c (precip coefficient) 
+
+**Graph uncertainty in mean yield anomaly across all parameter uncertainty (boxplot and cummulative distribution of the output).**
+
+```{r}
+# make it a dataframe
+sens_results_LH = as.data.frame(sens_results_LH)
+
+# plot it
+  ggplot(data = sens_results_LH, aes(x = " ", y = mean_yield)) +
+    geom_boxplot(fill = "brown") +
+    labs( 
+     title = "Latin Hypercube Uncertainty",
+      x = "Almond",
+      y = "Yield (as anomoly)"
+      ) +
+    theme_classic()
+
+```
+
+
+#### **Sobel method**
+
+```{r}
+
+```
+
+
+
+Repeat using twice as many parameter sets as you did in your first sensitivity analysis - and look at how this changes the sensitivity results

@@ -15,19 +15,19 @@
 
 almond_anomaly = function(clim_data, a = -0.015, b = -0.0046, c = -0.07, d = 0.0043, e = 0.28, mean_only = FALSE) {
   #Checking the colnames of he datase are righ
-  if(!all(c("month", "year", "tmax_c", "tmin_c", "precip") %in% colnames(clim_data))) {
-    stop ('Please make sure that the colnames of the data frame include \'month\', \'year\', \'tmax_c\', \'tmin_c\', and \'precip\'.')
-  } else if (!is.numeric(clim_data$month)) {
-    stop ('Please make sure the month data is numeric')
-  } else if (!is.numeric(clim_data$year)) {
-    stop ('Please make sure the year data is numeric')
-  } else if (!is.numeric(clim_data$tmax_c)) {
-    stop ('Please make sure the tmax_c data is numeric')
-  } else if (!is.numeric(clim_data$tmin_c)) {
-    stop ('Please make sure the tmin_c data is numeric')
-  } else if (!is.numeric(clim_data$precip)) {
-    stop ('Please make sure the precip data is numeric')
-  }
+    if(!all(c("month", "year", "tmax_c", "tmin_c", "precip") %in% colnames(clim_data))) {
+      stop ('Please make sure that the colnames of the data frame include \'month\', \'year\', \'tmax_c\', \'tmin_c\', and \'precip\'.')
+    } else if (!is.numeric(clim_data$month)) {
+      stop ('Please make sure the month data is numeric')
+    } else if (!is.numeric(clim_data$year)) {
+      stop ('Please make sure the year data is numeric')
+    } else if (!is.numeric(clim_data$tmax_c)) {
+      stop ('Please make sure the tmax_c data is numeric')
+    } else if (!is.numeric(clim_data$tmin_c)) {
+      stop ('Please make sure the tmin_c data is numeric')
+    } else if (!is.numeric(clim_data$precip)) {
+      stop ('Please make sure the precip data is numeric')
+    }
   
   for (i in clim_data$precip) {
     if (i < 0) {
@@ -50,7 +50,9 @@ almond_anomaly = function(clim_data, a = -0.015, b = -0.0046, c = -0.07, d = 0.0
   # Data wrangling after all the error checking
   climate_df <- clim_data %>%
       group_by(month, year) %>% 
-      summarise(tmax = mean(tmax_c), tmin = mean(tmin_c), precip=sum(precip))
+      summarise(tmax = mean(tmax_c),
+                tmin = mean(tmin_c), 
+                precip=sum(precip))
   
   # Creating a data frame storing necessary information for almond
   climate_tn2 <- climate_df %>% 
