@@ -107,9 +107,9 @@ ggplot(lhs_compare, aes(y = value, x = yield))+
   theme_minimal()
 ```
 
-# Sobel method, 10000 iterations.
+# Sobel method, 20000 iterations.
 ```{r}
-np = 10000
+np = 20000
 a = rnorm(mean=-0.015, sd=0.015/5, n = np)
 b = rnorm(mean=-0.0046, sd=0.0046/5, n = np)
 c = rnorm(mean=-0.07, sd=0.07/5, n = np)
@@ -161,9 +161,9 @@ ggplot(sens_result_sobel, aes(value)) +
   xlab("Mean Yield Anomaly (ton/acre)")
 ```
 
-# Sobel method, 20000 iterations.
+# Sobel method, 40000 iterations.
 ```{r}
-np_2 = 20000
+np_2 = 40000
 a = rnorm(mean=-0.015, sd=0.015/5, n = np_2)
 b = rnorm(mean=-0.0046, sd=0.0046/5, n = np_2)
 c = rnorm(mean=-0.07, sd=0.07/5, n = np_2)
@@ -180,7 +180,7 @@ e = rnorm(mean=0.28, sd=0.28/5, n = np_2)
 
 X2 = cbind.data.frame(a, b, c, d, e)
 
-sens_almond_sobel_2 = sobol2007(model = NULL, X1, X2, nboot = 200)
+sens_almond_sobel_2 = sobol2007(model = NULL, X1, X2, nboot = 100)
 
 tmp = mapply(FUN = almond_anomaly, a = sens_almond_sobel_2$X$a, b = sens_almond_sobel_2$X$b, c = sens_almond_sobel_2$X$c, d = sens_almond_sobel_2$X$d, e = sens_almond_sobel_2$X$e, MoreArgs = list(clim_data = clim, mean_only = TRUE))
 
