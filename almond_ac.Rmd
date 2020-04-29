@@ -1,6 +1,6 @@
 ---
-title: "almond_AC"
-author: "AnnaClaire Marley"
+title: "almond_SA"
+author: "AnnaClaire Marley, Ted Jiang"
 date: "4/27/2020"
 output: html_document
 ---
@@ -441,6 +441,7 @@ sum(sens_sobel_tell$T$original)
 **Rank the parameters in term of their sensitivity**
 
 Sensitivity Ranking (First Order)
+
 * 1) d (precip^2 coefficient) 
 * 2) c (precip coefficient)
 * 3) b (temp^2 coefficient) 
@@ -448,6 +449,7 @@ Sensitivity Ranking (First Order)
 * 5) a (temp coefficient)  
 
 Sensitivity Ranking (Total)
+
 * 1) d (precip^2 coefficient) 
 * 2) c (precip coefficient)
 * 3) b (temp^2 coefficient) 
@@ -496,8 +498,173 @@ grid.arrange(boxplot_LH, cum_dist_lh_gg, boxplot_sobel, cum_dis_sobel, ncol = 2)
 
 ```
 
+#### Try more parameter sets for the Sobel method
 
-### Writeup
+```{r}
 
-Both the Sobol and LHS methods showed a similar results distribution. Additionally, both methods show that the mean mean almond yield anomaly is most sensitive to the precipitation^2 parameter(d), followed by the precipitation parameter(c). We did not observe a significant difference in the sensitivity analysis results for either method afteer changing the simulations runs from 1k to 2k.However, there might be a difference when the number of simulation is even larger.
+# number of runs
+np=10000
 
+### generate two examples of random number from parmeter distributions ####
+
+  # naming parameters
+  a = rnorm(mean = -0.015, sd = 0.015/5, n=np)
+  b = rnorm(mean = -0.0046, sd = 0.0046/5, n=np)
+  c = rnorm(mean = -0.07, sd = 0.07/5, n=np)
+  d = rnorm(mean = 0.0043, sd = 0.0043/5, n=np)
+  e = rnorm(mean = 0.28, sd = 0.28/5, n=np)
+  
+  # create dataframe
+  X1 = cbind.data.frame(a, b, c, d, e)
+  
+  ## repeat process for second dataframe
+  # naming parameters
+  a = rnorm(mean = -0.015, sd = 0.015/5, n=np)
+  b = rnorm(mean = -0.0046, sd = 0.0046/5, n=np)
+  c = rnorm(mean = -0.07, sd = 0.07/5, n=np)
+  d = rnorm(mean = 0.0043, sd = 0.0043/5, n=np)
+  e = rnorm(mean = 0.28, sd = 0.28/5, n=np)
+  
+  # create dataframe
+  X2 = cbind.data.frame(a, b, c, d, e)
+
+# run sobel sensitivity
+sens_sobel = sobol2007(model = NULL, X1, X2, nboot = 100)
+
+# run model with parameters generated from sobel
+res = mapply(FUN = almond_anomaly,
+             a = sens_sobel$X$a,
+             b = sens_sobel$X$b,
+             c = sens_sobel$X$c,
+             d = sens_sobel$X$d,
+             e = sens_sobel$X$e,
+             MoreArgs=list(clim_data = clim,
+                           mean_only = TRUE))
+
+
+sens_sobel_tell = sensitivity::tell(sens_sobel, res, res.names="mean_yield")
+
+print(sens_sobel_tell)
+plot(sens_sobel_tell)
+
+#For testing purpose
+sum(sens_sobel_tell$S$original)
+sum(sens_sobel_tell$T$original)
+
+
+```
+
+```{r}
+
+# number of runs
+np=20000
+
+### generate two examples of random number from parmeter distributions ####
+
+  # naming parameters
+  a = rnorm(mean = -0.015, sd = 0.015/5, n=np)
+  b = rnorm(mean = -0.0046, sd = 0.0046/5, n=np)
+  c = rnorm(mean = -0.07, sd = 0.07/5, n=np)
+  d = rnorm(mean = 0.0043, sd = 0.0043/5, n=np)
+  e = rnorm(mean = 0.28, sd = 0.28/5, n=np)
+  
+  # create dataframe
+  X1 = cbind.data.frame(a, b, c, d, e)
+  
+  ## repeat process for second dataframe
+  # naming parameters
+  a = rnorm(mean = -0.015, sd = 0.015/5, n=np)
+  b = rnorm(mean = -0.0046, sd = 0.0046/5, n=np)
+  c = rnorm(mean = -0.07, sd = 0.07/5, n=np)
+  d = rnorm(mean = 0.0043, sd = 0.0043/5, n=np)
+  e = rnorm(mean = 0.28, sd = 0.28/5, n=np)
+  
+  # create dataframe
+  X2 = cbind.data.frame(a, b, c, d, e)
+
+# run sobel sensitivity
+sens_sobel = sobol2007(model = NULL, X1, X2, nboot = 100)
+
+# run model with parameters generated from sobel
+res = mapply(FUN = almond_anomaly,
+             a = sens_sobel$X$a,
+             b = sens_sobel$X$b,
+             c = sens_sobel$X$c,
+             d = sens_sobel$X$d,
+             e = sens_sobel$X$e,
+             MoreArgs=list(clim_data = clim,
+                           mean_only = TRUE))
+
+
+sens_sobel_tell = sensitivity::tell(sens_sobel, res, res.names="mean_yield")
+
+print(sens_sobel_tell)
+plot(sens_sobel_tell)
+
+#For testing purpose
+sum(sens_sobel_tell$S$original)
+sum(sens_sobel_tell$T$original)
+
+
+```
+```{r}
+
+# number of runs
+np=50000
+
+### generate two examples of random number from parmeter distributions ####
+
+  # naming parameters
+  a = rnorm(mean = -0.015, sd = 0.015/5, n=np)
+  b = rnorm(mean = -0.0046, sd = 0.0046/5, n=np)
+  c = rnorm(mean = -0.07, sd = 0.07/5, n=np)
+  d = rnorm(mean = 0.0043, sd = 0.0043/5, n=np)
+  e = rnorm(mean = 0.28, sd = 0.28/5, n=np)
+  
+  # create dataframe
+  X1 = cbind.data.frame(a, b, c, d, e)
+  
+  ## repeat process for second dataframe
+  # naming parameters
+  a = rnorm(mean = -0.015, sd = 0.015/5, n=np)
+  b = rnorm(mean = -0.0046, sd = 0.0046/5, n=np)
+  c = rnorm(mean = -0.07, sd = 0.07/5, n=np)
+  d = rnorm(mean = 0.0043, sd = 0.0043/5, n=np)
+  e = rnorm(mean = 0.28, sd = 0.28/5, n=np)
+  
+  # create dataframe
+  X2 = cbind.data.frame(a, b, c, d, e)
+
+# run sobel sensitivity
+sens_sobel = sobol2007(model = NULL, X1, X2, nboot = 100)
+
+# run model with parameters generated from sobel
+res = mapply(FUN = almond_anomaly,
+             a = sens_sobel$X$a,
+             b = sens_sobel$X$b,
+             c = sens_sobel$X$c,
+             d = sens_sobel$X$d,
+             e = sens_sobel$X$e,
+             MoreArgs=list(clim_data = clim,
+                           mean_only = TRUE))
+
+
+sens_sobel_tell = sensitivity::tell(sens_sobel, res, res.names="mean_yield")
+
+print(sens_sobel_tell)
+plot(sens_sobel_tell)
+
+#For testing purpose
+sum(sens_sobel_tell$S$original)
+sum(sens_sobel_tell$T$original)
+
+
+```
+
+#### Writeup
+
+Both the Sobol and LHS methods showed a similar results distribution. Additionally, both methods show that the mean mean almond yield anomaly is most sensitive to the precipitation^2 parameter(d), followed by the precipitation parameter(c). Although the sensitivity index for the rest three parameters (a, b, e) rank differently in different methods, the absolute value are all very low.  
+
+We did not observe a significant difference in the sensitivity analysis results for either method after changing the simulations runs from 1k to 2k.However, there might be a difference when the number of simulation is even larger.  
+
+Additionally for sobol method, we observe that: (1), the error bars for parameter d in the sensitivity index plot are large in both 1k iteration and 2k iteration scenario; (2), everytime we rerun the model, the output sensitivity indexes are significantly different. This probably means that 2k iteration is not large enough for the sensitivity indexes to converge. Hence, we further tried 10k, 20k, and 50k iterations. The results show that (1), with more iterations, the error bars are smaller; (2) With more iterations, the summation of both first-order sensitivity indexes and total sensitivity indexes converge to 1. This probably means that there is no interaction between the five parameters in this model.  
